@@ -4,7 +4,7 @@
   "description": "file upload server sampler",
   "main": "index.js",
   "scripts": {
-    "t2" : "node ./t2/app.js",
+    "t2": "node ./t2/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -13,7 +13,5 @@
   ],
   "author": "gbox3d",
   "license": "ISC",
-  "dependencies": {
-    "formidable": "^1.2.1"
-  }
+  "dependencies": {}
 }

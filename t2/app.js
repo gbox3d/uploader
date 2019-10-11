@@ -1,4 +1,3 @@
-const formidable = require('formidable');
 
 const http = require('http');
 const util = require('util');
