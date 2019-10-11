@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+<!-- 여러 개의 이미지 파일을 선택할 수 있고, 선택 목록을 fileinfo()로 전달한다. -->
+<div id="filedlg">
+  <input  type="file" multiple />
+</div>
+
+
+<script>
+
+  document.querySelector('#filedlg input').addEventListener('change',(evt)=> {
+
+    /*
+     <input type="file"> DOM 객체는 FileList 객체를 포함하고있음 , 엠버 이름은 files
+
+     즉 document.querySelector('#filedlg input').files 로 얻어지는 객체의 타입은 FileList 이다.
+
+     */
+    console.log(evt.target.files)
+
+    let files = evt.target.files
+    //files  는 배열이 아님 FileList라는 오브잭트임
+    for(let i=0;i<files.length;i++)
+    {
+      let _file = files[i]
+      console.log(`${_file.name} , ${_file.size}, ${_file.type} , ${_file.lastModifiedDate}`)
+    }
+
+    //console.log(evt.target.files[0].getName())
+
+  })
+
+
+</script>
+
+
+
+
+</body>
+</html>

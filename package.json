@@ -1,0 +1,19 @@
+{
+  "name": "uploader",
+  "version": "1.0.0",
+  "description": "file upload server sampler",
+  "main": "index.js",
+  "scripts": {
+    "t2" : "node ./t2/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nodejs",
+    "file upload"
+  ],
+  "author": "gbox3d",
+  "license": "ISC",
+  "dependencies": {
+    "formidable": "^1.2.1"
+  }
+}

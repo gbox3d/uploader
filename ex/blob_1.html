@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script>
+
+  // var debug = {hello: "world"};
+  /*
+  현재 페이지가 유지 될동안만 내부 저장소에서 관리된다.
+   */
+  var blob = new Blob(["hello"], {type : 'application/text'});
+
+  console.log(blob)
+
+  var url = URL.createObjectURL(blob);
+  console.log(url)
+
+  let _resp = (new Response(blob))
+
+  _resp.text().then(_=>console.log(_))
+
+
+</script>
+</body>
+</html>

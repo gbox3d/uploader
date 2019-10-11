@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+<div id="filedlg">
+  <p>read as data URL</p>
+
+  <input  type="file" multiple />
+</div>
+
+<div id="filedlg2">
+  <p>read as binary string</p>
+  <input  type="file" multiple />
+</div>
+
+<div id="filedlg3">
+  <p>read as array Buffer </p>
+  <input  type="file" multiple />
+</div>
+
+
+<script>
+
+  /*
+  https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
+  https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsBinaryString
+   */
+
+  document.querySelector('#filedlg input').addEventListener('change',(evt)=> {
+    console.log(evt.target.files[0])
+
+    const reader = new FileReader();
+    reader.onload = (_)=> {
+
+      console.log(_.target.result)
+      console.log(_.target.text)
+
+    }
+    reader.readAsDataURL(evt.target.files[0]);
+
+  })
+
+  document.querySelector('#filedlg2 input').addEventListener('change',(evt)=> {
+    console.log(evt.target.files[0])
+
+    const reader = new FileReader();
+    reader.onload = (_)=> {
+
+      console.log(_.target.result)
+      // console.log(_.target.text)
+
+    }
+    reader.readAsBinaryString(evt.target.files[0]);
+
+  })
+
+  document.querySelector('#filedlg3 input').addEventListener('change',(evt)=> {
+    console.log(evt.target.files[0])
+
+    const reader = new FileReader();
+    reader.addEventListener('load',(_)=> {
+      console.log(_.target.result)
+
+    })
+
+    reader.readAsArrayBuffer(evt.target.files[0]);
+
+  })
+
+</script>
+
+</body>
+</html>
