@@ -190,3 +190,5 @@ fabric.properties
 node_modules/
 
 .idea/
+
+uploads/
