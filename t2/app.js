@@ -123,8 +123,7 @@ function process_post(req, res) {
       req.on('data',function(data) {
         //body_data += data;
         body_data.push(data)
-        console.log(data.length);
-
+        console.log( `${data.length}  bytes saved `);
       });
 
       req.on('end', function () {
@@ -146,7 +145,9 @@ function process_post(req, res) {
     case '/upload':
     {
       //파일 열기
-      let fd = fs.openSync(`./uploads/${req.headers['upload-name']}`,"w");
+      let filepath = `./uploads/${req.headers['upload-name']}`;
+      console.log(`file path : ${filepath}`);
+      let fd = fs.openSync(filepath,"w");
 
       //포스트는 데이터가 조각조각 들어 온다.
       req.on('data',function(data) {
@@ -169,7 +170,7 @@ function process_post(req, res) {
           'Access-Control-Max-Age': '1000'
         });
 
-        console.log(body_data)
+        // console.log(body_data)
 
         let result = {result:'ok'}
         res.end(JSON.stringify(result));
