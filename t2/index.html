@@ -1,101 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <title>opencv App</title>
 </head>
+
 <body>
-<div name="mycanvas">
-  <canvas height="512" width="512" ></canvas>
-</div>
 
-<div>
   <button name="test-1"> Test 1</button>
-  <button name="test-2"> Test 2</button>
-</div>
 
-<script>
+  <div name="mycanvas">
+    <canvas height="512" width="512"></canvas>
+  </div>
+
+  <div>
+    <button name="test-2"> upload canvas 2</button>
+  </div>
+
+  <div style="border: solid 1px black; margin-top: 5px;">
+
+    <form name="upload-file">
+      <div style="height: 80px;">
+        <input type="file" name="file">
+      </div>
+      <button> upload with file Dlg </button>
+    </form>
 
 
-  function drawCanvas() {
+  </div>
 
-    var canvas = document.querySelector("[name=mycanvas] canvas")
-    var context = canvas.getContext('2d');
-    // begin custom shape
-    context.beginPath();
-    context.moveTo(170, 80);
-    context.bezierCurveTo(130, 100, 130, 150, 230, 150);
-    context.bezierCurveTo(250, 180, 320, 180, 340, 150);
-    context.bezierCurveTo(420, 150, 420, 120, 390, 100);
-    context.bezierCurveTo(430, 40, 370, 30, 340, 50);
-    context.bezierCurveTo(320, 5, 250, 20, 250, 50);
-    context.bezierCurveTo(200, 5, 150, 20, 170, 80);
+  <div style="border: solid 1px black; margin-top: 5px;">
+    <form name="upload-file-buffer">
+      <div style="height: 80px;">
+        <input type="file" name="file">
+      </div>
+      <button> upload with file Dlg (buffered) </button>
+    </form>
+    </div>
+  
+  </div>
+  
+  <script>
 
-    // complete custom shape
-    context.closePath();
-    context.lineWidth = 5;
-    context.fillStyle = '#8ED6FF';
-    context.fill();
-    context.strokeStyle = 'blue';
-    context.stroke();
-  }
-  drawCanvas();
 
-  document.querySelector('[name=test-1]').addEventListener('click',(evt)=> {
+    function drawCanvas() {
 
-    const body = { name: 'zerocho' };
+      var canvas = document.querySelector("[name=mycanvas] canvas")
+      var context = canvas.getContext('2d');
+      // begin custom shape
+      context.beginPath();
+      context.moveTo(170, 80);
+      context.bezierCurveTo(130, 100, 130, 150, 230, 150);
+      context.bezierCurveTo(250, 180, 320, 180, 340, 150);
+      context.bezierCurveTo(420, 150, 420, 120, 390, 100);
+      context.bezierCurveTo(430, 40, 370, 30, 340, 50);
+      context.bezierCurveTo(320, 5, 250, 20, 250, 50);
+      context.bezierCurveTo(200, 5, 150, 20, 170, 80);
 
-    fetch('http://localhost:8081/test?msg=hello', {
-      method: 'POST',
-      body : body,
-      headers: new Headers(
-        {'test-name' : 'miyuki'}
-      ), // 이 부분은 따로 설정하고싶은 header가 있다면 넣으세요
-    }).then((res) => {
-      if (res.status === 200 || res.status === 201) {
-        res.json().then(json => console.log(json));
-      } else {
-        console.error(res.statusText);
-      }
-    }).catch(err => console.error(err));
+      // complete custom shape
+      context.closePath();
+      context.lineWidth = 5;
+      context.fillStyle = '#8ED6FF';
+      context.fill();
+      context.strokeStyle = 'blue';
+      context.stroke();
+    }
+    drawCanvas();
 
-  })
+    document.querySelector('[name=test-1]').addEventListener('click', (evt) => {
 
-  document.querySelector('[name=test-2]').addEventListener('click',(evt)=> {
+      const body = { name: 'zerocho' };
 
-    let canvas = document.querySelector("[name=mycanvas] canvas")
-    let context = canvas.getContext('2d');
+      fetch('http://localhost:8081/test?msg=hello', {
+        method: 'POST',
+        body: body,
+        headers: new Headers(
+          { 'test-name': 'miyuki' }
+        ), // 이 부분은 따로 설정하고싶은 header가 있다면 넣으세요
+      }).then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          res.json().then(json => console.log(json));
+        } else {
+          console.error(res.statusText);
+        }
+      }).catch(err => console.error(err));
 
-    canvas.toBlob(function (blob) {
-      let reader = new FileReader();
+    })
 
-      reader.onload = function () {
-        console.log(reader.result);
+    document.querySelector('[name=test-2]').addEventListener('click', (evt) => {
+
+      let canvas = document.querySelector("[name=mycanvas] canvas")
+      let context = canvas.getContext('2d');
+
+      canvas.toBlob(function (blob) {
+        let reader = new FileReader();
+
+        reader.onload = function () {
+          console.log(reader.result);
+
+          fetch('http://localhost:8081/upload', {
+            method: 'POST',
+            body: reader.result,
+            headers: new Headers({
+              'Content-Type': 'image/png',
+              'Upload-Name': 'test.png'
+            }), // 이 부분은 따로 설정하고싶은 header가 있다면 넣으세요
+          }).then((res) => {
+            return res.json()
+          }).then(_ => {
+            console.log(_)
+          }).catch(err => console.error(err));
+
+        }
+
+        // reader.readAsBinaryString(blob);
+        reader.readAsArrayBuffer(blob);
+      });
+
+    });
+
+    document.querySelector('form[name=upload-file]').addEventListener('submit', evt => {
+
+      evt.preventDefault()
+
+      // console.log('submit',evt.target.file.files[0])
+
+      let _fileObj = evt.target.file.files[0];
+
+      const reader = new FileReader();
+      reader.addEventListener('load', (_) => {
+
+        console.log(_.target.result)
+        console.log(_fileObj)
 
         fetch('http://localhost:8081/upload', {
           method: 'POST',
-          body : reader.result,
+          body: reader.result,
           headers: new Headers({
-            'Content-Type' : 'image/png',
-            'Upload-Name' : 'test.png'
+            'Content-Type': 'image/png',
+            'Upload-Name': _fileObj.name,
+            'file-size': _fileObj.size
           }), // 이 부분은 따로 설정하고싶은 header가 있다면 넣으세요
         }).then((res) => {
           return res.json()
-        }).then(_=> {
+        }).then(_ => {
           console.log(_)
         }).catch(err => console.error(err));
+      })
+      reader.readAsArrayBuffer(_fileObj);
 
-      }
-
-      // reader.readAsBinaryString(blob);
-      reader.readAsArrayBuffer(blob);
     });
 
-  })
+    document.querySelector('form[name=upload-file-buffer]').addEventListener('submit', evt => {
+      evt.preventDefault()
+
+      let _fileObj = evt.target.file.files[0];
+
+      const reader = new FileReader();
+      reader.addEventListener('load', (_) => {
+
+        console.log(_.target.result)
+        console.log(_fileObj)
+
+        fetch('http://localhost:8081/upload-buffer', {
+          method: 'POST',
+          body: reader.result,
+          headers: new Headers({
+            'Content-Type': 'image/png',
+            'Upload-Name': _fileObj.name,
+            'file-size': _fileObj.size
+          }), // 이 부분은 따로 설정하고싶은 header가 있다면 넣으세요
+        }).then((res) => {
+          return res.json()
+        }).then(_ => {
+          console.log(_)
+        }).catch(err => console.error(err));
+      })
+      reader.readAsArrayBuffer(_fileObj);
+
+    });
 
 
 
-</script>
+  </script>
 
 </body>
+
 </html>
