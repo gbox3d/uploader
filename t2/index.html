@@ -8,7 +8,7 @@
 
 <body>
 
-  <button name="test-1"> Test 1</button>
+  <button name="test-1"> POST Test 1</button>
 
   <div name="mycanvas">
     <canvas height="512" width="512"></canvas>
@@ -76,7 +76,12 @@
         method: 'POST',
         body: body,
         headers: new Headers(
-          { 'test-name': 'miyuki' }
+          {
+            'Content-Type': 'text/plain',
+            'test-name': 'miyuki' 
+
+        }
+          // { 'test-name': 'miyuki' }
         ), // 이 부분은 따로 설정하고싶은 header가 있다면 넣으세요
       }).then((res) => {
         if (res.status === 200 || res.status === 201) {
@@ -102,10 +107,11 @@
           fetch('http://localhost:8081/upload', {
             method: 'POST',
             body: reader.result,
-            headers: new Headers({
+            headers: {
+              // 'Content-Type': 'text/plain',
               'Content-Type': 'image/png',
-              'Upload-Name': 'test.png'
-            }), // 이 부분은 따로 설정하고싶은 header가 있다면 넣으세요
+              'upload-name': 'test.png'
+            }, // 이 부분은 따로 설정하고싶은 header가 있다면 넣으세요
           }).then((res) => {
             return res.json()
           }).then(_ => {

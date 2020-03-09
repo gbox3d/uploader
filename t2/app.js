@@ -131,7 +131,9 @@ function process_post(req, res) {
             'Content-Type': 'text/plain',
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'POST',
-            'Access-Control-Max-Age': '1000'
+            'Access-Control-Max-Age': '1000',
+            "Access-Control-Allow-Headers": "test-name" //CORS 정책 허용  * 는 모두 허용 
+
           });
           console.log(body_data)
 
@@ -142,100 +144,141 @@ function process_post(req, res) {
       }
       break;
 
-      //POST로 들어 오는 데이터를 그때그때 파일에 쓰기 (메모리 절약)
+    //POST로 들어 오는 데이터를 그때그때 파일에 쓰기 (메모리 절약)
     case '/upload':
       {
-
-        res.writeHead(200, {
-          'Content-Type': 'text/plain',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST',
-          'Access-Control-Max-Age': '1000'
-        });
         
-        // body_data = [];
-        //파일 열기
-        let filepath = `./uploads/${req.headers['upload-name']}`;
-        console.log(`file path : ${filepath}`);
+        let uploadName = req.headers['upload-name']
 
-        let file_size = parseInt(req.headers['file-size'])
-        console.log(file_size)
-
-        //파일 오픈 
-        let fd = fs.openSync(filepath, "w");
-
-        let _index = 0;
-        //포스트는 데이터가 조각조각 들어 온다.
-        req.on('data', function (data) {
-          _index += data.length;
-          console.log(`data receive : ${data.length} , ${_index}`);
-          fs.writeSync(fd,data);
-          // res.write(JSON.stringify({index : _index}));
-        });
-
-        req.on('end', function () {
-          console.log(`data receive end : ${_index}`);
+        //만약 cORS보안상의 이유로 upload-name같은 커스텀 해더를 목읽어 온다면 Access-Control-Allow-Headers 옵션을 주어 응답하면 해당 옵션에 반응하여 재요청 들어온다.
+        if (!uploadName) {
+          //CORS 관련 처리 , 
+          res.writeHead(200, {
+            'Content-Type': 'text/plain',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST',
+            'Access-Control-Max-Age': '1000',
+            "Access-Control-Allow-Headers": "upload-name ,content-type ,file-size"
+            // "Access-Control-Allow-Headers": "*" //CORS 정책 허용  * 는 모두 허용 
+          });
           
-          fs.closeSync(fd);
-          // console.log(body_data)
+          console.log('try custom header')
+          res.end();
 
-          let result = { result: 'ok' }
-          res.end(JSON.stringify(result));
-
-        })
-        
-
-      }
-      break;
-
-      //POST 로 나누어져 들어오는 데이터를 버퍼로 모아 한꺼번에 상태로 처리하기 (데이터 가공 용도)
-    case '/upload-buffer':
-      {
-        // body_data = [];
-        //파일 열기
-        let filepath = `./uploads/${req.headers['upload-name']}`;
-        console.log(`file path : ${filepath}`);
-
-        let file_size = parseInt(req.headers['file-size'])
-        console.log(file_size)
-        // let fd = fs.openSync(filepath, "w");
-
-        //크기 만큼 할당 
-        const _buf = Buffer.allocUnsafe(file_size);
-
-        let _index = 0;
-
-        //포스트는 데이터가 조각조각 들어 온다.
-        req.on('data', function (data) {
-
-          //버퍼에 추가 
-          data.copy(_buf, _index);
-          _index += data.length;
-          console.log(`data receive : ${data.length} , ${_index}`);
-          //fs.writeSync(fd,data);
-        });
-
-        req.on('end', function () {
-          console.log(`data receive end : ${_index}`);
-          
-          //버퍼내용 파일에 저장
-          fs.writeFileSync(filepath, _buf);
-          // fs.closeSync(fd);
-
+        }
+        else {
           res.writeHead(200, {
             'Content-Type': 'text/plain',
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'POST',
             'Access-Control-Max-Age': '1000'
           });
+          let filepath = `../uploads/${uploadName}`;
 
-          // console.log(body_data)
+          console.log(`file path : ${filepath}`);
 
-          let result = { result: 'ok' }
-          res.end(JSON.stringify(result));
+          let file_size = parseInt(req.headers['file-size'])
+          console.log(file_size)
 
-        })
-        
+          //파일 오픈 
+          let fd = fs.openSync(filepath, "w");
+
+          let _index = 0;
+          //포스트는 데이터가 조각조각 들어 온다.
+          req.on('data', function (data) {
+            _index += data.length;
+            console.log(`data receive : ${data.length} , ${_index}`);
+            fs.writeSync(fd, data);
+            // res.write(JSON.stringify({index : _index}));
+          });
+
+          req.on('end', function () {
+            console.log(`data receive end : ${_index}`);
+
+            fs.closeSync(fd);
+            // console.log(body_data)
+
+            let result = { result: 'ok' }
+            res.end(JSON.stringify(result));
+
+          })
+
+        }
+      }
+      break;
+
+    //POST 로 나누어져 들어오는 데이터를 버퍼로 모아 한꺼번에 상태로 처리하기 (데이터 가공 용도)
+    case '/upload-buffer':
+      {
+
+        if (req.headers['upload-name'] === undefined) {
+
+          console.log('allow cors ')
+
+          //CORS 처리 
+          res.writeHead(200, {
+            'Content-Type': 'text/plain',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST',
+            'Access-Control-Max-Age': '1000',
+            "Access-Control-Allow-Headers": "*" //CORS 정책 허용  * 는 모두 허용 
+
+          });
+
+          res.end();
+        }
+
+        else {
+          // body_data = [];
+          //파일 열기
+          let filepath = `../uploads/${req.headers['upload-name']}`;
+          console.log(`file path : ${filepath}`);
+
+
+
+          let file_size = parseInt(req.headers['file-size'])
+          console.log(file_size)
+          // let fd = fs.openSync(filepath, "w");
+
+          //크기 만큼 할당 
+          const _buf = Buffer.allocUnsafe(file_size);
+
+          let _index = 0;
+
+          //포스트는 데이터가 조각조각 들어 온다.
+          req.on('data', function (data) {
+
+            //버퍼에 추가 
+            data.copy(_buf, _index);
+            _index += data.length;
+            console.log(`data receive : ${data.length} , ${_index}`);
+            //fs.writeSync(fd,data);
+          });
+
+          req.on('end', function () {
+            console.log(`data receive end : ${_index}`);
+
+            //버퍼내용 파일에 저장
+            fs.writeFileSync(filepath, _buf);
+            // fs.closeSync(fd);
+
+            res.writeHead(200, {
+              'Content-Type': 'text/plain',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'POST',
+              'Access-Control-Max-Age': '1000'
+            });
+
+            // console.log(body_data)
+
+            let result = { result: 'ok' }
+            res.end(JSON.stringify(result));
+
+          })
+
+        }
+
+
       }
       break;
 
