@@ -95,6 +95,31 @@ function process_get(req, res) {
           res.end(data);
         });
       break;
+    case '/download':
+      {
+        let header = {
+          'Content-Type': 'text/plain',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST',
+          'Access-Control-Max-Age': '1000',
+          "Access-Control-Allow-Headers": "*" //CORS 정책 허용  * 는 모두 허용 
+        }
+
+        let path = result.query.path
+        let _type = result.query.type
+
+        header['Content-Type'] = _type
+
+        let _data = fs.readFileSync(path)
+
+        res.writeHead(200, header);
+        res.end(JSON.stringify({
+          r: 'ok',
+          data: _data
+        }))
+      }
+
+      break;
     default:
       res.writeHead(200);
       res.end('file upload system version:' + theApp.version);
@@ -147,7 +172,7 @@ function process_post(req, res) {
     //POST로 들어 오는 데이터를 그때그때 파일에 쓰기 (메모리 절약)
     case '/upload':
       {
-        
+
         let uploadName = req.headers['upload-name']
 
         //만약 cORS보안상의 이유로 upload-name같은 커스텀 해더를 목읽어 온다면 Access-Control-Allow-Headers 옵션을 주어 응답하면 해당 옵션에 반응하여 재요청 들어온다.
@@ -161,7 +186,7 @@ function process_post(req, res) {
             "Access-Control-Allow-Headers": "upload-name ,content-type ,file-size"
             // "Access-Control-Allow-Headers": "*" //CORS 정책 허용  * 는 모두 허용 
           });
-          
+
           console.log('try custom header')
           res.end();
 
@@ -282,6 +307,10 @@ function process_post(req, res) {
       }
       break;
 
+
+    // default: {
+
+    // }
   }
 
 }

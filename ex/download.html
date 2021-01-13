@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+
+    <canvas id='mainCanvas' width="512" height="512"></canvas>
+
+    <script>
+
+        (async function () {
+            var canvas = document.querySelector("#mainCanvas")
+            var context = canvas.getContext('2d');
+
+
+            //bytearray 를 이미지로 변환하기 
+            let _res = await (await fetch('http://localhost:8081/download?path=./ex/jangdori.jpg&type=image/jpg')).json()
+
+            console.log(_res)
+
+            // let _bytes = new Uint8Array(_res.data.data)
+            // console.log(new Uint8Array(_res.data.data))
+
+            let _url_src = URL.createObjectURL(
+                new Blob([new Uint8Array(_res.data.data)], { type: 'image/jpg' })
+            );
+
+            let _imgObj = await new Promise((resolve, reject) => {
+                let img = new Image();
+                img.onload = function () {
+                    resolve(img)
+                }
+                img.src = _url_src
+            })
+            context.drawImage(_imgObj, 0, 0, _imgObj.width, _imgObj.height)
+
+
+            //text 변환
+            _res = await (await fetch('http://localhost:8081/download?path=./ex/download.html&type=text/plain')).json()
+            console.log(_res)
+            let _text = new TextDecoder().decode(new Uint8Array(_res.data.data))
+            console.log(_text)
+
+
+
+
+        })();
+
+
+
+
+
+    </script>
+
+</body>
+
+</html>
